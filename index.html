@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="scripts/misc.js"></script>
+    <script src="scripts/victor.js"></script>
+
+    <script src="scripts/convert.js"></script>
+
+    <script src="scripts/Chart.js"></script>
+    <script src="scripts/drawFlightpath.js"></script>
+
+    <script src="scripts/BB.js"></script>
+    <script src="scripts/FlightPath.js"></script>
+    <script src="scripts/magnus-test.js"></script>
+
+</head>
+<body>
+    <h3>Force of Drag: <span class="number" id="fdrag">0</span> N</h3>
+    <h3>X: <span class="number" id="drag-x">0</span> N, Y: <span class="number" id="drag-y">0</span> N</h3>
+
+
+    <h3>Force of Weight: <span class="number" id="weight">0</span> N</h3>
+
+    <div id="graph-div">
+        <canvas id="myCanvas" width="200" height="100"></canvas>
+    </div>
+</body>
+
+
+<script>
+
+    bb = new BB(g_to_kg(0.40), 0.003, 0.5);
+    path = new FlightPath(bb, fps_to_ms(366.72), 1);
+
+
+
+    // path.solve(0.01);
+
+    // console.log("Maximum Range: " + round(m_to_ft(path.results.maxRange), 1) + " feet")
+    // console.log("Time to solve: " + round(path.performance.solveT, 3) + " ms");
+
+    // plot the x vs y displacement (shows actual flight path over distance)
+    // drawFlightPath(path.data.xxData, path.data.xyData);
+
+    magnus()
+
+</script>
+
+</html>

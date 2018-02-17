@@ -1,0 +1,12 @@
+body {
+
+}
+
+.number {
+    color: firebrick;
+}
+
+#graph-div {
+    width: 70%;
+    margin: auto;
+}
