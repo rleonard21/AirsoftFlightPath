@@ -32,5 +32,12 @@ to complete.
 
 
 #### Example Graphic
+###### Varying Mass, Constant V0
 Below is an example graphic of the simulated flight paths of spheres of differing mass fired at constant velocity. 
 ![Imgur](https://i.imgur.com/b7NUqEH.jpg)
+
+###### Constant Mass, varying wind vector
+Below is an example of the simulated flight paths of spheres with varying wind vectors. Projectiles had identical mass and initial velocity. The blue path represents no wind and the red path represents a straight vertical line from the launched height. The green and yellow paths had wind vectors of `[-5 0 5]` and `[5 0 5]`, respectively.  
+
+![Imgur](https://i.imgur.com/hPqixJL.jpg)
+
