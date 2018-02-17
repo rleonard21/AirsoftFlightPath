@@ -25,7 +25,8 @@ FlightPath.prototype.data = {
     vyData: [], // velocity in y direction
     xxData: [], // displacement in x direction
     xyData: [],  // displacement in y direction
-    xData: []
+    xData: [],
+    xtData: []
 };
 
 // FlightPath.prototype._toVector = function(a) {
@@ -78,7 +79,7 @@ FlightPath.prototype.computeNetForce = function(v) {
     Vector.add(fw, fd, fnet); // sum the forces
     Vector.add(fm, fnet, fnet);
 
-    return fnet
+    return fnet;
 };
 
 
@@ -123,6 +124,7 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         this.data.xxData.push(p_new.x);
         this.data.xyData.push(p_new.y);
         this.data.xData.push([p_new.x, p_new.y]);
+        this.data.xtData.push([t, p_new.x]);
 
         if(p_new.y <= 0) {
             // object has hit the ground; stop the simulation
