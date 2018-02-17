@@ -34,6 +34,7 @@ to complete.
 #### Example Graphic
 ###### Varying Mass, Constant V0
 Below is an example graphic of the simulated flight paths of spheres of differing mass fired at constant velocity. 
+
 ![Imgur](https://i.imgur.com/b7NUqEH.jpg)
 
 ###### Constant Mass, varying wind vector
