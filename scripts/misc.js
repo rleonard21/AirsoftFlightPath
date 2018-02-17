@@ -10,7 +10,7 @@ function randInt(min, max) {
 
 function extractColumn(arr, column) {
     // https://gist.github.com/eddieajau/5f3e289967de60cf7bf9
-    
+
     function reduction(previousValue, currentValue) {
         previousValue.push(currentValue[column]);
         return previousValue;
