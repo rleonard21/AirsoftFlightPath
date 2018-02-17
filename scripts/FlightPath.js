@@ -21,18 +21,18 @@ FlightPath.prototype.results = {
 
 
 FlightPath.prototype.data = {
-    t: [], // stores the time intervals
+    all: [],  // [t x y z vx vy vz] (7 dimension)
+    t: [],    // stores the time intervals
     vx: [],   // velocity in x direction
     vy: [],   // velocity in y direction
+    vz: [],   // velocity in z direction
     x: [],    // displacement in x direction
     y: [],    // displacement in y direction
-    xy: [],   // distance x vs distance y (2 dimension)
-    all: []  // [t x y z vx vy vz] (7 dimension)
-};
+    z: [],    // displacement in z direction
+    xy: [],   // distance x vs distance y (2 dimension) (flight path data)
 
-// FlightPath.prototype._toVector = function(a) {
-//     return new Victor(a, a);
-// };
+    //path: data.xy
+};
 
 
 FlightPath.prototype.computeWeight = function() {
@@ -149,7 +149,19 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
 
 
 FlightPath.prototype.separateData = function() {
-    this.data.t = this.data.all;
+    // i tried iterating but it didn't work... so copy + paste :(
+    this.data.t = extractColumn(this.data.all, 0);
+    this.data.x = extractColumn(this.data.all, 1);
+    this.data.y = extractColumn(this.data.all, 2);
+    this.data.z = extractColumn(this.data.all, 3);
+    this.data.vx = extractColumn(this.data.all, 4);
+    this.data.vy = extractColumn(this.data.all, 5);
+    this.data.vz = extractColumn(this.data.all, 6);
+
+    // concat the x and y data sets to form the flightpath data set
+    for(let i = 0; i < this.data.x.length; i++) {
+        this.data.xy.push([this.data.x[i], this.data.y[i]]);
+    }
 };
 
 
