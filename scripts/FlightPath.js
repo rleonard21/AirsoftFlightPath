@@ -1,8 +1,9 @@
 class FlightPath {
-    constructor(bb, v0, y0) {
+    constructor(bb, v0, y0, w) {
         this.bb = bb;
         this.v0 = v0;
         this.y0 = y0;
+        this.w = w || 0;
     }
 }
 
@@ -23,7 +24,8 @@ FlightPath.prototype.data = {
     vxData: [], // velocity in x direction
     vyData: [], // velocity in y direction
     xxData: [], // displacement in x direction
-    xyData: []  // displacement in y direction
+    xyData: [],  // displacement in y direction
+    xData: []
 };
 
 // FlightPath.prototype._toVector = function(a) {
@@ -48,12 +50,21 @@ FlightPath.prototype.computeDragMagnitude = function(c, r, v) {
 
 FlightPath.prototype.computeDragForce = function(v) {
     let fd_direction = v.unit().negative(); // drag force opposes motion (creates unit vector)
-
     let fd_magnitude = this.computeDragMagnitude(this.bb.dragCoeff, this.bb.radius, v.length()); // drag force magnitude
-    //fd_magnitude = this._toVector(fd_magnitude); // Victor has no scalar multiplication, so convert to vector
-
 
     return fd_direction.multiply(fd_magnitude); // create the drag force vector
+};
+
+
+FlightPath.prototype.computeMagnusForce = function(v) {
+    let rho = 1.225;
+    let omega = new Vector(0, 0, this.w);
+    let tmp = Math.pow(Math.PI, 2) * Math.pow(this.bb.radius, 3) * rho;
+
+    let f1 = omega.cross(v);
+    f1.multiply(tmp);
+
+    return f1.multiply(tmp);
 };
 
 
@@ -62,8 +73,10 @@ FlightPath.prototype.computeNetForce = function(v) {
 
     let fw = this.computeWeight(); // weight
     let fd = this.computeDragForce(v); // force of drag
+    let fm = this.computeMagnusForce(v);
 
     Vector.add(fw, fd, fnet); // sum the forces
+    Vector.add(fm, fnet, fnet);
 
     return fnet
 };
@@ -109,6 +122,7 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         this.data.vyData.push(v_new.y);
         this.data.xxData.push(p_new.x);
         this.data.xyData.push(p_new.y);
+        this.data.xData.push([p_new.x, p_new.y]);
 
         if(p_new.y <= 0) {
             // object has hit the ground; stop the simulation
