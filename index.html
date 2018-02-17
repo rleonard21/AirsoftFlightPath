@@ -20,11 +20,8 @@
 
 </head>
 <body>
-    <h3>Force of Drag: <span class="number" id="fdrag">0</span> N</h3>
-    <h3>X: <span class="number" id="drag-x">0</span> N, Y: <span class="number" id="drag-y">0</span> N</h3>
-
-
-    <h3>Force of Weight: <span class="number" id="weight">0</span> N</h3>
+    <h3>Time In Air: <span class="number" id="airtime">0</span> Seconds</h3>
+    <h3>Maximum Range: <span class="number" id="range">0</span> Feet</h3>
 
     <div class="download-btn">
         <button id ="btn">Download CSV</button>
@@ -39,9 +36,8 @@
 
 <script>
 
-    bb = new BB(g_to_kg(0.40), 0.003, 0.5);
-    path = new FlightPath(bb, fps_to_ms(400), 1, 500);
-
+    let bb = new BB(g_to_kg(0.40), 0.003, 0.5);
+    let path = new FlightPath(bb, fps_to_ms(400), 1, 200);
 
 
     path.solve(0.001, 10);
@@ -51,13 +47,16 @@
     console.log("Time to solve: " + round(path.performance.solveT, 3) + " ms");
 
 
-    drawFlightPath(path.data.xxData, path.data.xyData);
+    // drawFlightPath(path.data.xxData, path.data.xyData, path.results.maxRange);
+
+
+    document.getElementById("airtime").innerHTML = round(path.results.timeToGround, 2);
+    document.getElementById("range").innerHTML = round(path.results.maxRange * 3.2808399, 1);
 
 
     document.getElementById('btn').onclick = function(){
-        arrayToCSV(path.data.xData);
+        arrayToCSV(path.data.xtData, 'FlightPathData.csv');
     };
-
 
 
 

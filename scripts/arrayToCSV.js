@@ -1,4 +1,4 @@
-function arrayToCSV (twoDiArray) {
+function arrayToCSV(twoDiArray, filename) {
     //  Modified from: http://stackoverflow.com/questions/17836273/
     //  export-javascript-data-to-csv-file-without-server-interaction
     let csvRows = [];
@@ -13,7 +13,7 @@ function arrayToCSV (twoDiArray) {
     let a         = document.createElement('a');
     a.href        = 'data:attachment/csv,' + csvString;
     a.target      = '_blank';
-    a.download    = 'flightPathData.csv';
+    a.download    = filename;
 
     document.body.appendChild(a);
     a.click();
