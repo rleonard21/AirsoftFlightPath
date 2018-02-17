@@ -36,11 +36,18 @@
 
 <script>
 
-    let bb = new BB(g_to_kg(0.40), 0.003, 0.5);
-    let path = new FlightPath(bb, fps_to_ms(400), 1, 200);
+    let bb = new BB(g_to_kg(0.20), 0.003, 0.5);
+
+    let wind = {
+      x: 0,
+      y: 0,
+      z: 0
+    };
+
+    let path = new FlightPath(bb, fps_to_ms(400), 1, 200, wind);
 
 
-    path.solve(0.001, 10);
+    path.solve(0.05, 10);
 
     console.log("Time to fall:  " + round(path.results.timeToGround, 3));
     console.log("Maximum Range: " + round(m_to_ft(path.results.maxRange), 1) + " feet");
@@ -50,12 +57,20 @@
     // drawFlightPath(path.data.xxData, path.data.xyData, path.results.maxRange);
 
 
+
+    path.separateData();
+
+    console.log(path.data.t);
+
+
+
+
+
     document.getElementById("airtime").innerHTML = round(path.results.timeToGround, 2);
     document.getElementById("range").innerHTML = round(path.results.maxRange * 3.2808399, 1);
 
-
     document.getElementById('btn').onclick = function(){
-        arrayToCSV(path.data.xtData, 'FlightPathData.csv');
+        arrayToCSV(path.data.all, 'FlightPathData.csv');
     };
 
 
