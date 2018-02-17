@@ -10,9 +10,6 @@
 
     <script src="scripts/convert.js"></script>
 
-    <script src="scripts/Chart.js"></script>
-    <script src="scripts/drawFlightpath.js"></script>
-
     <script src="scripts/BB.js"></script>
     <script src="scripts/FlightPath.js"></script>
 
@@ -22,6 +19,7 @@
 <body>
     <h3>Time In Air: <span class="number" id="airtime">0</span> Seconds</h3>
     <h3>Maximum Range: <span class="number" id="range">0</span> Feet</h3>
+    <h3>Solve Time: <span class="number" id="solve">0</span> milliseconds</h3>
 
     <div class="download-btn">
         <button id ="btn">Download CSV</button>
@@ -38,42 +36,34 @@
 
     let bb = new BB(g_to_kg(0.20), 0.003, 0.5);
 
-    let wind = {
+    let v0 = 400; // fps
+    let y0 = 1;   // height above ground, meters
+    let w = 200;  // angular velocity
+
+    let wind = {  // wind velocity vector
       x: 0,
       y: 0,
       z: 0
     };
 
-    let path = new FlightPath(bb, fps_to_ms(400), 1, 200, wind);
+    // setup a new FlightPath object
+    let path = new FlightPath(bb, fps_to_ms(v0), y0, w, wind);
 
+    // solve the flight path
+    path.solve(0.01, 10);
 
-    path.solve(0.05, 10);
-
-    console.log("Time to fall:  " + round(path.results.timeToGround, 3));
-    console.log("Maximum Range: " + round(m_to_ft(path.results.maxRange), 1) + " feet");
-    console.log("Time to solve: " + round(path.performance.solveT, 3) + " ms");
-
-
-    // drawFlightPath(path.data.xxData, path.data.xyData, path.results.maxRange);
-
-
-
+    // extract the data into smaller arrays
     path.separateData();
 
-    console.log(path.data.t);
-
-
-
-
-
+    // change the HTML
     document.getElementById("airtime").innerHTML = round(path.results.timeToGround, 2);
     document.getElementById("range").innerHTML = round(path.results.maxRange * 3.2808399, 1);
+    document.getElementById("solve").innerHTML = round(path.performance.solveT, 2);
 
+    // download data when button is clicked
     document.getElementById('btn').onclick = function(){
         arrayToCSV(path.data.all, 'FlightPathData.csv');
     };
-
-
 
 </script>
 
