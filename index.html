@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="scripts/misc.js"></script>
-    <script src="scripts/victor.js"></script>
+    <script src="scripts/vector.js"></script>
 
     <script src="scripts/convert.js"></script>
 
@@ -34,19 +34,20 @@
 <script>
 
     bb = new BB(g_to_kg(0.40), 0.003, 0.5);
-    path = new FlightPath(bb, fps_to_ms(366.72), 1);
+    path = new FlightPath(bb, fps_to_ms(400), 1);
 
 
 
-    // path.solve(0.01);
+    path.solve(0.0001);
 
-    // console.log("Maximum Range: " + round(m_to_ft(path.results.maxRange), 1) + " feet")
-    // console.log("Time to solve: " + round(path.performance.solveT, 3) + " ms");
+    console.log("Time to fall:  " + round(path.results.timeToGround, 3));
+    console.log("Maximum Range: " + round(m_to_ft(path.results.maxRange), 1) + " feet")
+    console.log("Time to solve: " + round(path.performance.solveT, 3) + " ms");
 
     // plot the x vs y displacement (shows actual flight path over distance)
     // drawFlightPath(path.data.xxData, path.data.xyData);
 
-    magnus()
+    // magnus()
 
 </script>
 

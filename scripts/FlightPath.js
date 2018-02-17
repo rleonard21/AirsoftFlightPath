@@ -26,15 +26,15 @@ FlightPath.prototype.data = {
     xyData: []  // displacement in y direction
 };
 
-FlightPath.prototype._toVector = function(a) {
-    return new Victor(a, a);
-};
+// FlightPath.prototype._toVector = function(a) {
+//     return new Victor(a, a);
+// };
 
 
 FlightPath.prototype.computeWeight = function() {
     let fw = this.bb.mass * -9.8;
 
-    return new Victor(0, fw);
+    return new Vector(0, fw, 0);
 };
 
 
@@ -47,53 +47,50 @@ FlightPath.prototype.computeDragMagnitude = function(c, r, v) {
 
 
 FlightPath.prototype.computeDragForce = function(v) {
-    let v_norm = v.clone().normalize(); // velocity direction (unit vector)
-    let fd_direction = v_norm.invert(); // drag force opposes motion (creates unit vector)
+    let fd_direction = v.unit().negative(); // drag force opposes motion (creates unit vector)
 
-    let fd_magnitude = this.computeDragMagnitude(this.bb.dragCoeff, this.bb.radius, v.magnitude()); // drag force magnitude
-    fd_magnitude = this._toVector(fd_magnitude); // Victor has no scalar multiplication, so convert to vector
+    let fd_magnitude = this.computeDragMagnitude(this.bb.dragCoeff, this.bb.radius, v.length()); // drag force magnitude
+    //fd_magnitude = this._toVector(fd_magnitude); // Victor has no scalar multiplication, so convert to vector
 
-    return fd_magnitude.multiply(fd_direction); // create the drag force vector
+
+    return fd_direction.multiply(fd_magnitude); // create the drag force vector
 };
 
 
 FlightPath.prototype.computeNetForce = function(v) {
-    let fnet = new Victor(0, 0); // empty vector to store the net force
+    let fnet = new Vector(0, 0, 0); // empty vector to store the net force
 
     let fw = this.computeWeight(); // weight
     let fd = this.computeDragForce(v); // force of drag
 
-    fnet.add(fw).add(fd); // sum the forces
+    Vector.add(fw, fd, fnet); // sum the forces
 
     return fnet
 };
 
 
 FlightPath.prototype._velocityUpdate = function(v_0, f_net, _t) {
-    let mass = this._toVector(this.bb.mass);
+    let a_net = f_net.divide(this.bb.mass); // net acceleration (a = f/this.bb.mass)
+    let v_step = a_net.multiply(_t); // velocity for this slice of time (v = a * t)
 
-    let a_net = f_net.clone().divide(mass); // net acceleration (a = f/this.bb.mass)
-    let v_step = a_net.clone().multiply(_t); // velocity for this slice of time (v = a * t)
-
-    return v_0.clone().add(v_step); // add the slice of velocity to the current velocity
+    return v_0.add(v_step); // add the slice of velocity to the current velocity
 };
 
 
 FlightPath.prototype._positionUpdate = function(x_0, v_0, _t) {
-    let x_new = v_0.clone().multiply(_t); // compute the distance travelled in the slice of time (x = v * t)
+    let x_new = v_0.multiply(_t); // compute the distance travelled in the slice of time (x = v * t)
 
-    return x_0.clone().add(x_new); // add the slice to the current position
+    return x_0.add(x_new); // add the slice to the current position
 };
 
 
 FlightPath.prototype.solve = function(delta_t, t_max) {
-    let v_new = new Victor(this.v0, 0); // vector to hold the velocity info during simulation
-    let p_new = new Victor(0, this.y0); // vector for position info
+    let v_new = new Vector(this.v0, 0, 0); // vector to hold the velocity info during simulation
+    let p_new = new Vector(0, this.y0, 0); // vector for position info
     
     delta_t = delta_t || 0.0001; // use a custom d_t if provided (affects accuracy of simulation)
-    let delta_t_s = this._toVector(delta_t);
-
     t_max = t_max || 5; // use a custom maximum time if provided (affects max length of simulation)
+
     let t = 0;
 
     let t0 = performance.now();
@@ -103,8 +100,8 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         let f_net = this.computeNetForce(v_new);
 
         // update the velocity and position
-        v_new = this._velocityUpdate(v_new, f_net, delta_t_s);
-        p_new = this._positionUpdate(p_new, v_new, delta_t_s);
+        v_new = this._velocityUpdate(v_new, f_net, delta_t);
+        p_new = this._positionUpdate(p_new, v_new, delta_t);
 
         // save the simulation steps for later analysis
         this.data.timeData.push(t);
