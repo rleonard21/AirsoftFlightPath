@@ -31,4 +31,6 @@ insignificant for 6mm projectiles. The `solve` function generally takes between 
 to complete. 
 
 
-![](graphing/pdf/first.pdf)
+#### Example Graphic
+Below is an example graphic of the simulated flight paths of spheres of differing mass fired at constant velocity. 
+![Imgur](https://i.imgur.com/b7NUqEH.jpg)
