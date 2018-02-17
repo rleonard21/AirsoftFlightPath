@@ -1,9 +1,10 @@
 class FlightPath {
-    constructor(bb, v0, y0, w) {
+    constructor(bb, v0, y0, w, wind) {
         this.bb = bb;
         this.v0 = v0;
         this.y0 = y0;
         this.w = w || 0;
+        this.wind = new Vector(wind.x, wind.y, wind.z) || new Vector(0,0,0);
     }
 }
 
@@ -20,13 +21,13 @@ FlightPath.prototype.results = {
 
 
 FlightPath.prototype.data = {
-    timeData: [], // stores the time intervals
-    vxData: [], // velocity in x direction
-    vyData: [], // velocity in y direction
-    xxData: [], // displacement in x direction
-    xyData: [],  // displacement in y direction
-    xData: [],
-    xtData: []
+    t: [], // stores the time intervals
+    vx: [],   // velocity in x direction
+    vy: [],   // velocity in y direction
+    x: [],    // displacement in x direction
+    y: [],    // displacement in y direction
+    xy: [],   // distance x vs distance y (2 dimension)
+    all: []  // [t x y z vx vy vz] (7 dimension)
 };
 
 // FlightPath.prototype._toVector = function(a) {
@@ -100,6 +101,14 @@ FlightPath.prototype._positionUpdate = function(x_0, v_0, _t) {
 
 FlightPath.prototype.solve = function(delta_t, t_max) {
     let v_new = new Vector(this.v0, 0, 0); // vector to hold the velocity info during simulation
+
+    console.log("V old: " + v_new.length());
+
+    Vector.add(v_new, this.wind, v_new);
+
+    console.log("Wind: " + this.wind.length());
+    console.log("V new: " + v_new.length());
+
     let p_new = new Vector(0, this.y0, 0); // vector for position info
     
     delta_t = delta_t || 0.0001; // use a custom d_t if provided (affects accuracy of simulation)
@@ -118,13 +127,7 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         p_new = this._positionUpdate(p_new, v_new, delta_t);
 
         // save the simulation steps for later analysis
-        this.data.timeData.push(t);
-        this.data.vxData.push(v_new.x);
-        this.data.vyData.push(v_new.y);
-        this.data.xxData.push(p_new.x);
-        this.data.xyData.push(p_new.y);
-        this.data.xData.push([p_new.x, p_new.y]);
-        this.data.xtData.push([t, p_new.x]);
+        this.data.all.push([t, p_new.x, p_new.y, p_new.z, v_new.x, v_new.y, v_new.z]);
 
         if(p_new.y <= 0) {
             // object has hit the ground; stop the simulation
@@ -142,6 +145,16 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
     // compute and save the amount of time it took to solve
     let t1 = performance.now();
     this.performance.solveT = t1 - t0;
-
-
 };
+
+
+FlightPath.prototype.separateData = function() {
+    this.data.t = this.data.all;
+};
+
+
+
+
+
+
+
