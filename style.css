@@ -10,3 +10,9 @@ body {
     width: 70%;
     margin: auto;
 }
+
+.overflow-csv {
+    overflow: scroll;
+    width: 100%;
+    background-color: aquamarine;
+}
