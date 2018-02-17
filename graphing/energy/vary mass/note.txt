@@ -1,0 +1,4 @@
+It appears energy is conserved with the current model (despite having
+a drag force). Magnus does no work since it is perpendicular to 
+velocity (cross product). All four BBs with the same kinetic energy fly 
+identical paths with this model. 
