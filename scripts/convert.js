@@ -9,3 +9,7 @@ function g_to_kg(g) {
 function m_to_ft(m) {
     return m * 3.2808399;
 }
+
+function degree_to_rad(d) {
+    return d * (Math.PI / 180);
+}
