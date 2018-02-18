@@ -1,10 +1,10 @@
 class FlightPath {
-    constructor(bb, v0, y0, w, wind) {
+    constructor(bb, v0, p0, w, wind) {
         this.bb = bb;
         this.v0 = v0;
-        this.y0 = y0;
+        this.p0 = p0;
         this.w = w || 0;
-        this.wind = new Vector(wind.x, wind.y, wind.z) || new Vector(0,0,0);
+        this.wind = wind;
     }
 }
 
@@ -51,6 +51,9 @@ FlightPath.prototype.computeDragMagnitude = function(c, r, v) {
 
 
 FlightPath.prototype.computeDragForce = function(v) {
+
+    // Vector.add(this.wind, v, v); // the velocity is with respect to the wind
+
     let fd_direction = v.unit().negative(); // drag force opposes motion (creates unit vector)
     let fd_magnitude = this.computeDragMagnitude(this.bb.dragCoeff, this.bb.radius, v.length()); // drag force magnitude
 
@@ -63,6 +66,8 @@ FlightPath.prototype.computeMagnusForce = function(v) {
     let omega = new Vector(0, 0, this.w);
     let tmp = Math.pow(Math.PI, 2) * Math.pow(this.bb.radius, 3) * rho;
 
+    // Vector.add(this.wind, v, v);
+
     let f1 = omega.cross(v);
     f1.multiply(tmp);
 
@@ -70,15 +75,21 @@ FlightPath.prototype.computeMagnusForce = function(v) {
 };
 
 
+FlightPath.prototype.computeWindForce = function() {
+    return this.computeDragForce(this.wind);
+}
+
 FlightPath.prototype.computeNetForce = function(v) {
     let fnet = new Vector(0, 0, 0); // empty vector to store the net force
 
     let fw = this.computeWeight(); // weight
     let fd = this.computeDragForce(v); // force of drag
     let fm = this.computeMagnusForce(v);
+    let fwind = this.computeWindForce();
 
     Vector.add(fw, fd, fnet); // sum the forces
     Vector.add(fm, fnet, fnet);
+    Vector.add(fwind, fnet, fnet);
 
     return fnet;
 };
@@ -100,17 +111,9 @@ FlightPath.prototype._positionUpdate = function(x_0, v_0, _t) {
 
 
 FlightPath.prototype.solve = function(delta_t, t_max) {
-    let v_new = new Vector(this.v0, 0, 0); // vector to hold the velocity info during simulation
+    let v_new = this.v0; // vector to hold the velocity info during simulation
+    let p_new = this.p0; // vector for position info
 
-    console.log("V old: " + v_new.length());
-
-    Vector.add(v_new, this.wind, v_new);
-
-    console.log("Wind: " + this.wind.length());
-    console.log("V new: " + v_new.length());
-
-    let p_new = new Vector(0, this.y0, 0); // vector for position info
-    
     delta_t = delta_t || 0.0001; // use a custom d_t if provided (affects accuracy of simulation)
     t_max = t_max || 5; // use a custom maximum time if provided (affects max length of simulation)
 
@@ -139,6 +142,7 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         } else {
             // object is still falling; increment the time
             t += delta_t;
+            // this.w *= 0.8;
         }
     }
 
