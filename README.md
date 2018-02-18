@@ -1,7 +1,7 @@
 ## Projectile Flight Path Simulator
 #### About
-This Javascript based project simulate the 3D flight path of a rotating spherical object as it flies 
-through the air. Several external forces in addition to gravity are considered in the simulation. Forces, accelerations, velocities, and positions are calculated as 3D vectors.  
+This Javascript based project simulates the 3D flight path of a rotating spherical object as it flies 
+through the air. Several external forces are considered in the simulation to create a more accurate model. Forces, accelerations, velocities, and positions are calculated as 3D vectors.  
 
 
 #### Code Structure
@@ -24,6 +24,9 @@ Magnus Effect of the rotating body. The projectile generally travels farther wit
 taken into consideration because both forces have a vertical vector component that oppose gravity,
 thus reducing vertical acceleration. 
 
+###### Wind
+The effects of wind are taken into consideration only terms of an additional force. Relative wind is not considered in the calculation of the Magnus Effect. 
+
 ###### Completion
 The simulation completes when the projectile hits the ground (`y` coordinate of position vector
 is less than zero). This does not take into account the radius of the projectile because it is 
@@ -31,16 +34,14 @@ insignificant for 6mm projectiles. The `solve` function generally takes between 
 to complete. 
 
 
-#### Example Graphic
+#### Example Graphics
 ###### Varying Mass, Constant V0
 Below is an example graphic of the simulated flight paths of spheres of differing mass fired at constant velocity. 
-
 
 ![Imgur](https://i.imgur.com/b7NUqEH.jpg)
 
 
-###### Constant Mass, varying wind vector
-Below is an example of the simulated flight paths of spheres with varying wind vectors. Projectiles had identical mass and initial velocity. The blue path represents no wind and the red path represents a straight vertical line from the launched height. The green and yellow paths had wind vectors of `[-5 0 5]` and `[5 0 5]`, respectively.  
+###### Varying Mass, Constant Wind
+Below is an example of the simulated flight paths of spheres with varying wind vectors. Projectiles were launched from 1 meter, had varying masses, and an indentical initial velocity. The velocity of the wind was `[0 0 -5]` in meters per second. Note the lighter mass deviates farther from the centerline since acceleration is inversely proportional to mass. 
 
-![Imgur](https://i.imgur.com/hPqixJL.jpg)
-
+![Imgur](https://i.imgur.com/yh0Mn3y.jpg)
