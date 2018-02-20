@@ -1,10 +1,10 @@
 class FlightPath {
-    constructor(bb, v0, p0, w, wind) {
-        this.bb = bb;
-        this.v0 = v0;
-        this.p0 = p0;
-        this.w = w || 0;
-        this.wind = wind;
+    constructor(projectile, v0, p0, w, wind) {
+        this.projectile = projectile;   // a Sphere object
+        this.v0 = v0;                   // velocity vector
+        this.p0 = p0;                   // position vector
+        this.w = w || 0;                // angular velocity (may make this a vector later on)
+        this.wind = wind;               // wind vector
     }
 }
 
@@ -21,22 +21,12 @@ FlightPath.prototype.results = {
 
 
 FlightPath.prototype.data = {
-    all: [],  // [t x y z vx vy vz] (7 dimension)
-    t: [],    // stores the time intervals
-    vx: [],   // velocity in x direction
-    vy: [],   // velocity in y direction
-    vz: [],   // velocity in z direction
-    x: [],    // displacement in x direction
-    y: [],    // displacement in y direction
-    z: [],    // displacement in z direction
-    xy: [],   // distance x vs distance y (2 dimension) (flight path data)
-
-    //path: data.xy
+    all: [],  // [t x y z vx vy vz fx fy fz] (10 dimension)
 };
 
 
 FlightPath.prototype.computeWeight = function() {
-    let fw = this.bb.mass * -9.8;
+    let fw = this.projectile.mass * -9.8;
 
     return new Vector(0, fw, 0);
 };
@@ -51,11 +41,10 @@ FlightPath.prototype.computeDragMagnitude = function(c, r, v) {
 
 
 FlightPath.prototype.computeDragForce = function(v) {
+    let v_rel = v.add(this.wind); // velocity for drag is with respect to the wind, so add the wind vector
 
-    // Vector.add(this.wind, v, v); // the velocity is with respect to the wind
-
-    let fd_direction = v.unit().negative(); // drag force opposes motion (creates unit vector)
-    let fd_magnitude = this.computeDragMagnitude(this.bb.dragCoeff, this.bb.radius, v.length()); // drag force magnitude
+    let fd_direction = v_rel.unit().negative(); // drag force opposes motion (creates unit vector)
+    let fd_magnitude = this.computeDragMagnitude(this.projectile.dragCoeff, this.projectile.radius, v_rel.length()); // drag force magnitude
 
     return fd_direction.multiply(fd_magnitude); // create the drag force vector
 };
@@ -64,11 +53,11 @@ FlightPath.prototype.computeDragForce = function(v) {
 FlightPath.prototype.computeMagnusForce = function(v) {
     let rho = 1.225;
     let omega = new Vector(0, 0, this.w);
-    let tmp = Math.pow(Math.PI, 2) * Math.pow(this.bb.radius, 3) * rho;
+    let tmp = Math.pow(Math.PI, 2) * Math.pow(this.projectile.radius, 3) * rho;
 
-    // Vector.add(this.wind, v, v);
+    let v_rel = v.add(this.wind); // magnus force needs the velocity relative to the wind, so add the wind vector
 
-    let f1 = omega.cross(v);
+    let f1 = omega.cross(v_rel);
     f1.multiply(tmp);
 
     return f1.multiply(tmp);
@@ -77,7 +66,7 @@ FlightPath.prototype.computeMagnusForce = function(v) {
 
 FlightPath.prototype.computeWindForce = function() {
     return this.computeDragForce(this.wind);
-}
+};
 
 FlightPath.prototype.computeNetForce = function(v) {
     let fnet = new Vector(0, 0, 0); // empty vector to store the net force
@@ -85,18 +74,16 @@ FlightPath.prototype.computeNetForce = function(v) {
     let fw = this.computeWeight(); // weight
     let fd = this.computeDragForce(v); // force of drag
     let fm = this.computeMagnusForce(v);
-    let fwind = this.computeWindForce();
 
     Vector.add(fw, fd, fnet); // sum the forces
     Vector.add(fm, fnet, fnet);
-    Vector.add(fwind, fnet, fnet);
 
     return fnet;
 };
 
 
 FlightPath.prototype._velocityUpdate = function(v_0, f_net, _t) {
-    let a_net = f_net.divide(this.bb.mass); // net acceleration (a = f/this.bb.mass)
+    let a_net = f_net.divide(this.projectile.mass); // net acceleration (a = f/this.projectile.mass)
     let v_step = a_net.multiply(_t); // velocity for this slice of time (v = a * t)
 
     return v_0.add(v_step); // add the slice of velocity to the current velocity
@@ -114,7 +101,7 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
     let v_new = this.v0; // vector to hold the velocity info during simulation
     let p_new = this.p0; // vector for position info
 
-    delta_t = delta_t || 0.0001; // use a custom d_t if provided (affects accuracy of simulation)
+    delta_t = delta_t || 0.001; // use a custom d_t if provided (affects accuracy of simulation)
     t_max = t_max || 5; // use a custom maximum time if provided (affects max length of simulation)
 
     let t = 0;
@@ -129,10 +116,10 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         v_new = this._velocityUpdate(v_new, f_net, delta_t);
         p_new = this._positionUpdate(p_new, v_new, delta_t);
 
-        // save the simulation steps for later analysis
-        this.data.all.push([t, p_new.x, p_new.y, p_new.z, v_new.x, v_new.y, v_new.z]);
+        // save the simulation steps for later analysis [ t x y z vx vy vz fx fy fz ]
+        this.data.all.push([t, p_new.x, p_new.y, p_new.z, v_new.x, v_new.y, v_new.z, f_net.x, f_net.y, f_net.z]);
 
-        if(p_new.y <= 0) {
+        if(p_new.y <= this.projectile.radius) {
             // object has hit the ground; stop the simulation
             this.results.timeToGround = t;
             this.results.maxRange = p_new.x;
@@ -142,7 +129,6 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
         } else {
             // object is still falling; increment the time
             t += delta_t;
-            // this.w *= 0.8;
         }
     }
 
@@ -150,27 +136,3 @@ FlightPath.prototype.solve = function(delta_t, t_max) {
     let t1 = performance.now();
     this.performance.solveT = t1 - t0;
 };
-
-
-FlightPath.prototype.separateData = function() {
-    // i tried iterating but it didn't work... so copy + paste :(
-    this.data.t = extractColumn(this.data.all, 0);
-    this.data.x = extractColumn(this.data.all, 1);
-    this.data.y = extractColumn(this.data.all, 2);
-    this.data.z = extractColumn(this.data.all, 3);
-    this.data.vx = extractColumn(this.data.all, 4);
-    this.data.vy = extractColumn(this.data.all, 5);
-    this.data.vz = extractColumn(this.data.all, 6);
-
-    // concat the x and y data sets to form the flightpath data set
-    for(let i = 0; i < this.data.x.length; i++) {
-        this.data.xy.push([this.data.x[i], this.data.y[i]]);
-    }
-};
-
-
-
-
-
-
-
