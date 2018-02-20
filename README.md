@@ -1,14 +1,15 @@
 ## Projectile Flight Path Simulator
 #### About
 This Javascript based project simulate the 3D flight path of a rotating spherical object as it flies 
-through the air. Several external forces in addition to gravity are considered in the simulation. Forces, accelerations, velocities, and positions are calculated as 3D vectors.  
+through the air. Several external forces in addition to gravity are considered in the simulation.
+Forces, accelerations, velocities, and positions are calculated as 3D vectors.
 
 
 #### Code Structure
-The simulation code is written in Javascript and is meant to be run on a local server. The webserver
+The simulation code is written in Javascript and is meant to be run on a local server. The web server
 is very rudimentary with minimal CSS. It runs the simulation immediately on page load and the 
 numeric results are displayed on the page. A download button allows the user to download a CSV file
-with the seven dimensions of the data: `[t x y z vx vy vz]`.
+with the 10 dimensions of the data: `[t x y z vx vy vz fx fy fz]`.
 Wolfram Mathematica is used to manually generate the graphics from the downloaded data.
 
 
