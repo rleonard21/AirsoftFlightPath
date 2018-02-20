@@ -1,6 +1,5 @@
 ## Projectile Flight Path Simulator
 #### About
-<<<<<<< HEAD
 This Javascript based project simulates the 3D flight path of a rotating spherical object as it flies 
 through the air. Several external forces in addition to gravity are considered in the simulation.
 Forces, accelerations, velocities, and positions are calculated as 3D vectors.
