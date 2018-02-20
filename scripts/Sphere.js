@@ -1,4 +1,4 @@
-class BB {
+class Sphere {
     constructor(mass, radius, dragCoeff) {
         this.mass = mass;
         this.radius = radius;
