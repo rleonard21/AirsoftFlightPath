@@ -38,12 +38,12 @@ to complete with the default `delta_t` value.
 
 #### Example Graphics
 ###### Varying Mass, Constant V0
-Below is an example graphic of the simulated flight paths of spheres of differing mass fired at constant velocity. 
+Below is an example graphic of the simulated flight paths of spheres of differing mass fired at constant velocity. Each spherical projectile had an identical and constant backspin. As a result of the backspin and the Magnus effect, the projectiles initially fly upwards before losing velocity.
 
 ![Imgur](https://i.imgur.com/b7NUqEH.jpg)
 
 
 ###### Varying Mass, Constant Wind
-Below is an example of the simulated flight paths of spheres with varying wind vectors. Projectiles were launched from 1 meter, had varying masses, and an indentical initial velocity. The velocity of the wind was `[0 0 -5]` in meters per second. Note the lighter mass deviates farther from the centerline since acceleration is inversely proportional to mass. 
+Below is an example of the simulated flight paths of spheres with varying wind vectors. Projectiles were launched from 1 meter, had varying masses, and an indentical initial velocity. The velocity of the wind was `[0 0 -5]` in meters per second. Note the lighter mass deviates farther from the centerline since acceleration is inversely proportional to mass. Similar to the simulation above, each mass had an identical and constant backspin, which explains the initial upwards flight path.
 
 ![Imgur](https://i.imgur.com/yh0Mn3y.jpg)
